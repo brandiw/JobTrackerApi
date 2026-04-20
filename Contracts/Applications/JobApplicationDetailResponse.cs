@@ -1,8 +1,9 @@
+using JobTrackerApi.Contracts.InterviewNotes;
 using JobTrackerApi.Models.Enums;
 
 namespace JobTrackerApi.Contracts.Applications;
 
-public class JobApplicationResponse
+public class JobApplicationDetailResponse
 {
     public int Id { get; set; }
     public string Title { get; set; } = "";
@@ -10,4 +11,5 @@ public class JobApplicationResponse
     public ApplicationStatus Status { get; set; }
     public RoleType RoleType { get; set; }
     public int CompanyId { get; set; }
+    public List<InterviewNoteResponse> Notes { get; set; } = new();
 }

@@ -1,4 +1,5 @@
 using JobTrackerApi.Contracts.Applications;
+using JobTrackerApi.Contracts.InterviewNotes;
 using JobTrackerApi.Data;
 using JobTrackerApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -30,6 +31,7 @@ public class ApplicationsController : ControllerBase
                 Title = a.Title,
                 Url = a.Url,
                 Status = a.Status,
+                RoleType = a.RoleType,
                 CompanyId = a.CompanyId
             })
             .ToListAsync();
@@ -44,13 +46,24 @@ public class ApplicationsController : ControllerBase
         var application = await _context.Applications
             .AsNoTracking()
             .Where(a => a.Id == id)
-            .Select(a => new JobApplicationResponse
+            .Select(a => new JobApplicationDetailResponse
             {
                 Id = a.Id,
                 Title = a.Title,
                 Url = a.Url,
                 Status = a.Status,
-                CompanyId = a.CompanyId
+                RoleType = a.RoleType,
+                CompanyId = a.CompanyId,
+                Notes = a.InterviewNotes
+                    .OrderBy(n => n.Id)
+                    .Select(n => new InterviewNoteResponse
+                    {
+                        Id = n.Id,
+                        Note = n.Note,
+                        NextStep = n.NextStep,
+                        JobApplicationId = n.JobApplicationId
+                    })
+                    .ToList()
             })
             .FirstOrDefaultAsync();
 
