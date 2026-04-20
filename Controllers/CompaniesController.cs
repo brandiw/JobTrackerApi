@@ -81,14 +81,14 @@ public class CompaniesController : ControllerBase
 
     // PUT: api/companies/{id}
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] object company)
+    public IActionResult UpdateCompany(int id, [FromBody] object company)
     {
         return Ok(new { message = $"Company with id {id} updated" });
     }
 
     // DELETE: api/companies/{id}
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
+    public async Task<IActionResult> DeleteCompany(int id)
     {
         var company = await _context.Companies.FindAsync(id);
 

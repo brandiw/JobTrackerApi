@@ -1,4 +1,8 @@
+using JobTrackerApi.Contracts.Applications;
+using JobTrackerApi.Data;
+using JobTrackerApi.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JobTrackerApi.Controllers;
 
@@ -6,38 +10,113 @@ namespace JobTrackerApi.Controllers;
 [Route("api/[controller]")]
 public class ApplicationsController : ControllerBase
 {
+    private readonly AppDbContext _context;
+
+    public ApplicationsController(AppDbContext context)
+    {
+        _context = context;
+    }
+
     // GET: api/applications
     [HttpGet]
-    public IActionResult GetAll()
+    public async Task<ActionResult<IEnumerable<JobApplicationResponse>>> GetApplications()
     {
-        return Ok(new { message = "Get all applications" });
+        var applications = await _context.Applications
+            .AsNoTracking()
+            .OrderBy(a => a.Id)
+            .Select(a => new JobApplicationResponse
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Url = a.Url,
+                Status = a.Status,
+                CompanyId = a.CompanyId
+            })
+            .ToListAsync();
+
+        return Ok(applications);
     }
 
     // GET: api/applications/{id}
     [HttpGet("{id}")]
-    public IActionResult GetById(int id)
+    public async Task<ActionResult<JobApplicationResponse>> GetApplication(int id)
     {
-        return Ok(new { message = $"Get application with id {id}" });
+        var application = await _context.Applications
+            .AsNoTracking()
+            .Where(a => a.Id == id)
+            .Select(a => new JobApplicationResponse
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Url = a.Url,
+                Status = a.Status,
+                CompanyId = a.CompanyId
+            })
+            .FirstOrDefaultAsync();
+
+        if (application == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(application);
     }
 
     // POST: api/applications
     [HttpPost]
-    public IActionResult Create([FromBody] object application)
+    public async Task<ActionResult<JobApplicationResponse>> CreateApplication([FromBody] CreateJobApplicationRequest request)
     {
-        return CreatedAtAction(nameof(GetById), new { id = 1 }, new { message = "Application created" });
+        var companyExists = await _context.Companies.AnyAsync(c => c.Id == request.CompanyId);
+
+        if (!companyExists)
+        {
+            return BadRequest($"Company with id {request.CompanyId} does not exist.");
+        }
+
+        var application = new JobApplication
+        {
+            Title = request.Title,
+            Url = request.Url,
+            Status = request.Status,
+            CompanyId = request.CompanyId
+        };
+
+        _context.Applications.Add(application);
+        await _context.SaveChangesAsync();
+
+        var response = new JobApplicationResponse
+        {
+            Id = application.Id,
+            Title = application.Title,
+            Url = application.Url,
+            Status = application.Status,
+            CompanyId = application.CompanyId
+        };
+
+        return CreatedAtAction(nameof(GetApplication), new { id = application.Id }, response);
     }
 
     // PUT: api/applications/{id}
     [HttpPut("{id}")]
-    public IActionResult Update(int id, [FromBody] object application)
+    public IActionResult UpdateApplication(int id, [FromBody] object application)
     {
         return Ok(new { message = $"Application with id {id} updated" });
     }
 
     // DELETE: api/applications/{id}
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> DeleteApplication(int id)
     {
+        var application = await _context.Applications.FindAsync(id);
+
+        if (application == null)
+        {
+            return NotFound();
+        }
+
+        _context.Applications.Remove(application);
+        await _context.SaveChangesAsync();
+
         return NoContent();
     }
 }
