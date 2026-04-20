@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace JobTrackerApi.Models.Enums;
 
 public enum ApplicationStatus
