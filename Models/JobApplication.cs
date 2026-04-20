@@ -1,4 +1,5 @@
 using JobTrackerApi.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace JobTrackerApi.Models;
 

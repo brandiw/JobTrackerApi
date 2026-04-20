@@ -1,4 +1,5 @@
 using JobTrackerApi.Contracts.Companies;
+using JobTrackerApi.Contracts.Applications;
 using JobTrackerApi.Data;
 using JobTrackerApi.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -43,13 +44,24 @@ public class CompaniesController : ControllerBase
     {
         var company = await _context.Companies
             .AsNoTracking()
-            .Select(c => new CompanyResponse
+            .Select(c => new CompanyWithApplicationsResponse
             {
                 Id = c.Id,
                 Name = c.Name,
                 Website = c.Website,
                 LocationCity = c.LocationCity,
-                LocationState = c.LocationState
+                LocationState = c.LocationState,
+                Applications = c.Applications
+                    .OrderBy(a => a.Id)
+                    .Select(a => new JobApplicationResponse
+                    {
+                        Id = a.Id,
+                        Title = a.Title,
+                        Url = a.Url,
+                        Status = a.Status,
+                        CompanyId = a.CompanyId
+                    })
+                    .ToList()
             })
             .FirstOrDefaultAsync(c => c.Id == id);
         
@@ -102,4 +114,33 @@ public class CompaniesController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("{companyId:int}/applications")]
+    public async Task<ActionResult<IEnumerable<JobApplicationResponse>>> GetApplicationsForCompany(int companyId)
+    {
+        var companyExists = await _context.Companies
+            .AsNoTracking()
+            .AnyAsync(c => c.Id == companyId);
+
+        if (!companyExists)
+        {
+            return NotFound();
+        }
+
+        var applications = await _context.Applications
+            .AsNoTracking()
+            .Where(a => a.CompanyId == companyId)
+            .OrderBy(a => a.Id)
+            .Select(a => new JobApplicationResponse
+            {
+                Id = a.Id,
+                Title = a.Title,
+                Url = a.Url,
+                Status = a.Status,
+                CompanyId = a.CompanyId
+            })
+            .ToListAsync();
+
+    return Ok(applications);
+}
 }
