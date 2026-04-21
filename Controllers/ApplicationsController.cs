@@ -54,6 +54,7 @@ public class ApplicationsController : ControllerBase
                 Status = a.Status,
                 RoleType = a.RoleType,
                 CompanyId = a.CompanyId,
+                DateApplied = a.DateApplied,
                 Notes = a.InterviewNotes
                     .OrderBy(n => n.Id)
                     .Select(n => new InterviewNoteResponse
