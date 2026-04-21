@@ -9,5 +9,7 @@ public class JobApplicationResponse
     public string? Url { get; set; }
     public ApplicationStatus Status { get; set; }
     public RoleType RoleType { get; set; }
+
+    public DateTime DateApplied { get; set; }
     public int CompanyId { get; set; }
 }

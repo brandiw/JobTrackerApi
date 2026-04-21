@@ -91,6 +91,8 @@ public class ApplicationsController : ControllerBase
             Title = request.Title,
             Url = request.Url,
             Status = request.Status,
+            RoleType = request.RoleType,
+            DateApplied = DateTime.SpecifyKind(request.DateApplied, DateTimeKind.Utc),
             CompanyId = request.CompanyId
         };
 
@@ -103,6 +105,8 @@ public class ApplicationsController : ControllerBase
             Title = application.Title,
             Url = application.Url,
             Status = application.Status,
+            RoleType = application.RoleType,
+            DateApplied = application.DateApplied,
             CompanyId = application.CompanyId
         };
 

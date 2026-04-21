@@ -10,6 +10,8 @@ public class JobApplicationDetailResponse
     public string? Url { get; set; }
     public ApplicationStatus Status { get; set; }
     public RoleType RoleType { get; set; }
+
+    public DateTime DateApplied { get; set; }
     public int CompanyId { get; set; }
     public List<InterviewNoteResponse> Notes { get; set; } = new();
 }

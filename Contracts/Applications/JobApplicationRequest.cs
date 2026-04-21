@@ -20,5 +20,8 @@ public class CreateJobApplicationRequest
     public RoleType RoleType { get; set; }
 
     [Required]
+    public DateTime DateApplied { get; set; }
+
+    [Required]
     public int CompanyId { get; set; }
 }

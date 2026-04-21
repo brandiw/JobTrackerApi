@@ -1,15 +1,18 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
 
 namespace JobTrackerApi.Models.Enums;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ApplicationStatus
 {
     Applied = 0,
     
-    [Display(Name = "Initial Screen")]
+    [JsonStringEnumMemberName("Initial Screen")]
     InitialScreen = 1,
 
-    [Display(Name = "Code Test")]
+    [JsonStringEnumMemberName("Code Test")]
     CodeTest = 2,
     
     Interviewing = 3,
